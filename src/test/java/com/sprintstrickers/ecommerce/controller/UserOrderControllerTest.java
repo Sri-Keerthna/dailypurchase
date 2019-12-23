@@ -24,7 +24,7 @@ import com.sprintstrickers.ecommerce.service.UserOrderService;
 public class UserOrderControllerTest {
 
 	@InjectMocks
-	UserOrderController policyController;
+	UserOrderController userOrderController;
 
 	@Mock
 	UserOrderService userOrderService;
@@ -33,7 +33,7 @@ public class UserOrderControllerTest {
 
 	static OrderResponseDto orderResponseDto = new OrderResponseDto();
 	static List<OrderResponseDto> orderListDto = new ArrayList<>();
-	
+
 	@Before
 	public void setup() {
 		orderResponseDto.setProductName("aaa");
@@ -43,12 +43,12 @@ public class UserOrderControllerTest {
 		orderResponseDto.setUserOrderId(1);
 		orderListDto.add(orderResponseDto);
 	}
-	
+
 	@Test
 	public void testOrderListPositive() throws NoOrdersFoundException {
 		logger.info("Got the list of products");
 		Mockito.when(userOrderService.getOrderList(1)).thenReturn(orderListDto);
-		HttpStatus result=policyController.orderList(1).getStatusCode();
+		HttpStatus result = userOrderController.orderList(1).getStatusCode();
 		assertEquals(HttpStatus.OK, result);
 	}
 

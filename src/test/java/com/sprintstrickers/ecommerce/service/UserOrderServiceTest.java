@@ -34,7 +34,7 @@ public class UserOrderServiceTest {
 
 	@Mock
 	UserOrderRepository userOrderRepository;
-	
+
 	@Mock
 	UserRepository userRepository;
 
@@ -42,37 +42,37 @@ public class UserOrderServiceTest {
 
 	static OrderResponseDto orderResponseDto = new OrderResponseDto();
 	static List<OrderResponseDto> orderListDto = new ArrayList<>();
-	static User user=new User();
-	static UserOrder order=new UserOrder();
-	static List<UserOrder> userList=new ArrayList<>();
-	
+	static User user = new User();
+	static UserOrder order = new UserOrder();
+	static List<UserOrder> userList = new ArrayList<>();
+
 	@Before
 	public void setup() {
 		user.setDob(LocalDate.of(2000, 9, 10));
 		user.setEmail("ddd");
 		user.setIncome(2000D);
 		user.setUserId(1);
-		
+
 		order.setUserId(user);
 		order.setUserOrderId(1);
 		order.setProductPrice(2000D);
 		userList.add(order);
 	}
-	
+
 	@Test
 	public void testGetOrderListPositive() throws NoOrdersFoundException {
 		logger.info("inside the get order list method");
 		Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
 		Mockito.when(userOrderRepository.findByUserId(user)).thenReturn(userList);
 		BeanUtils.copyProperties(order, orderResponseDto);
-		List<OrderResponseDto> result=userOrderService.getOrderList(1);
+		List<OrderResponseDto> result = userOrderService.getOrderList(1);
 		assertEquals(1, result.size());
 	}
-	
+
 	@Test(expected = NoOrdersFoundException.class)
 	public void testGetOrderListNegative() throws NoOrdersFoundException {
 		logger.info("inside the get order list method");
-		List<UserOrder> usersLists=new ArrayList<>();
+		List<UserOrder> usersLists = new ArrayList<>();
 		Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
 		Mockito.when(userOrderRepository.findByUserId(user)).thenReturn(usersLists);
 		userOrderService.getOrderList(1);
