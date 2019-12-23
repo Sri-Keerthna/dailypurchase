@@ -25,17 +25,17 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public LoginResponseDto userLogin(LoginRequestDto loginRequestDto) throws InvalidUser {
-		LoginResponseDto loginResponseDto=null;
+		LoginResponseDto loginResponseDto=new LoginResponseDto();
 		Optional<User> optionalUser=userRepository.findByEmail(loginRequestDto.getUserEmail());
 		if(optionalUser.isPresent()) {
 			if(optionalUser.get().getEmail().equals(loginRequestDto.getUserEmail()) && optionalUser.get().getPassword().equals(loginRequestDto.getPassword())){
 				loginResponseDto=new LoginResponseDto();
-					loginResponseDto.setMessage(ApiConstant.LOGIN_FAILURE);
+					loginResponseDto.setMessage(ApiConstant.LOGIN_SUCCESS);
 					loginResponseDto.setStatusCode(201);
 					
 			}else {
-				throw new InvalidUser(ApiConstant.LOGIN_FAILURE);
-		}
+				loginResponseDto.setMessage(ApiConstant.LOGIN_FAILURE);
+			}
 		}else {
 			throw new InvalidUser(ApiConstant.USER_NOT_FOUND);
 		}
