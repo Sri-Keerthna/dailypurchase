@@ -53,7 +53,7 @@ public class UserOrderServiceTest {
 		user.setIncome(2000D);
 		user.setUserId(1);
 
-		order.setUserId(user);
+		order.setUser(user);
 		order.setUserOrderId(1);
 		order.setProductPrice(2000D);
 		userList.add(order);

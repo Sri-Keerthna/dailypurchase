@@ -27,7 +27,7 @@ public class UserOrder {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId", nullable = false)
-	private User userId;
+	private User user;
 	
 	private String productName;
 	private Integer totalQuantity;
