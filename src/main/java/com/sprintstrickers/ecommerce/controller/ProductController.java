@@ -2,6 +2,8 @@ package com.sprintstrickers.ecommerce.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class ProductController {
 	 * it will throw an error
 	 */
 	@GetMapping
-	public ResponseEntity<List<Product>> productList(@RequestParam("productName") String productName)
+	public ResponseEntity<List<Product>> productList(@Valid @RequestParam("productName") String productName)
 			throws NoProductFoundException {
 		logger.info("Got the list of products");
 		List<Product> productList = productService.getProductList(productName);

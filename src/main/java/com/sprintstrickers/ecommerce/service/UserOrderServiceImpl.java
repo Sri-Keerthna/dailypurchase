@@ -50,13 +50,9 @@ public class UserOrderServiceImpl implements UserOrderService {
 	public List<OrderResponseDto> getOrderList(Integer userId) throws NoOrdersFoundException {
 		logger.info("inside the get order list method");
 		List<OrderResponseDto> responseDto=new ArrayList<>();
-		List<UserOrder> orderList = new ArrayList<>();
 		Optional<User> userResponse=userRepository.findById(userId);
-		
 		if(userResponse.isPresent()) {
-			orderList = orderRepository.findByUserUserId(userResponse.get().getUserId());
-		}
-		
+		List<UserOrder> orderList = orderRepository.findByUserId(userResponse.get());
 		if (orderList.isEmpty()) {
 			throw new NoOrdersFoundException(StringConstant.ORDERS_EXCEPTION);
 		} else {
@@ -65,8 +61,10 @@ public class UserOrderServiceImpl implements UserOrderService {
 				BeanUtils.copyProperties(order, orderResponseDto);
 				responseDto.add(orderResponseDto);
 			});
-			return responseDto;
+			
 		}
+		}
+		return responseDto;
 	}
 
 }

@@ -2,6 +2,8 @@ package com.sprintstrickers.ecommerce.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class UserOrderController {
 	 *                                an error
 	 */
 	@GetMapping("/{userId}/orders")
-	public ResponseEntity<List<OrderResponseDto>> orderList(@PathVariable("userId") Integer userId)
+	public ResponseEntity<List<OrderResponseDto>> orderList(@Valid @PathVariable("userId") Integer userId)
 			throws NoOrdersFoundException {
 		logger.info("Got the list of products");
 		List<OrderResponseDto> orderList = orderService.getOrderList(userId);
