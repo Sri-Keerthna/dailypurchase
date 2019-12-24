@@ -63,21 +63,23 @@ public class PurchaseProductServiceImplTest {
 	public void testPurchaseProduct() throws InvalidProduct, InvalidUser {
 		Mockito.when(userRepository.findByUserId(200)).thenReturn(Optional.of(user));
 		Mockito.when(productRepository.findByProductId(100)).thenReturn(Optional.of(product));
-		Mockito.when(userOrderRepository.save(userOrder)).thenReturn(userOrder);
+		//Mockito.when(userOrderRepository.save(userOrder)).thenReturn(userOrder);
 		PurchaseProductResponseDto response=purchaseProductServiceImpl.purchaseProduct(200, 100, purchaseProductRequestDto);
 	assertEquals(ApiConstant.ORDERED_SUCCESS, response.getMessage());
 	}
 	@Test(expected =InvalidUser.class )
 	public void testPurchaseProductForUserException() throws InvalidProduct, InvalidUser {
-		Mockito.when(userRepository.findByUserId(400)).thenReturn(Optional.of(user));
+		Optional<User> optionalUser=Optional.ofNullable(null);
+		Mockito.when(userRepository.findByUserId(400)).thenReturn(optionalUser);
 		Mockito.when(productRepository.findByProductId(100)).thenReturn(Optional.of(product));
 		Mockito.when(userOrderRepository.save(userOrder)).thenReturn(userOrder);
 		purchaseProductServiceImpl.purchaseProduct(200, 100, purchaseProductRequestDto);
 	}
 	@Test(expected =InvalidProduct.class )
 	public void testPurchaseProductForProductException() throws InvalidProduct, InvalidUser {
+		Optional<Product> optionalProduct=Optional.ofNullable(null);
 		Mockito.when(userRepository.findByUserId(200)).thenReturn(Optional.of(user));
-		Mockito.when(productRepository.findByProductId(300)).thenReturn(Optional.of(product));
+		Mockito.when(productRepository.findByProductId(300)).thenReturn(optionalProduct);
 		Mockito.when(userOrderRepository.save(userOrder)).thenReturn(userOrder);
 		purchaseProductServiceImpl.purchaseProduct(200, 100, purchaseProductRequestDto);
 	}

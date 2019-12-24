@@ -73,30 +73,6 @@ public class PurchaseProductServiceImpl implements PurchaseProductService {
 				order.setTotalQuantity(purchaseProductRequestDto.getNoOfProducts());
 				Double totalPrice = noOfProducts * price;
 				order.setTotalPrice(totalPrice);
-
-				// Call Rest Template for checking whether credit card is exists or not.
-				RestTemplate restTemplate = new RestTemplate();
-				String endPointUrl = "http://localhost:8082/mycredit/creditcards/users/"
-						+ optionalUser.get().getUserId() + "/details";
-				ResponseEntity<CreditCardDetailsResponseDto> creditCardDetailsResponseDto = restTemplate
-						.getForEntity(endPointUrl, CreditCardDetailsResponseDto.class);
-				CreditCardDetailsResponseDto restTemplateResponse = creditCardDetailsResponseDto.getBody();
-
-				// Call Rest Template for checking whether credit card is exists or not.
-
-				Map<String, Integer> params = new HashMap<>();
-				params.put("userId", optionalUser.get().getUserId());
-
-				List<CreditCardDetailsDto> creditCardDetailsDto = restTemplateResponse.getCreditCardDetails();
-				CreditCardDetailsDto inputCreditCardDetailsDto = creditCardDetailsDto.get(0);
-				CreditCardRequestDto creditCardRequestDto = new CreditCardRequestDto();
-				BeanUtils.copyProperties(inputCreditCardDetailsDto, creditCardRequestDto);
-
-				final String url = "http://localhost:8082/mycredit/users/" + userId + "/accounts";
-				HttpHeaders requestHeaders = new HttpHeaders();
-				requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-
-
 				userOrderRepository.save(order);
 				purchaseProductResponseDto.setMessage(ApiConstant.ORDERED_SUCCESS);
 				purchaseProductResponseDto.setStatusCode(201);

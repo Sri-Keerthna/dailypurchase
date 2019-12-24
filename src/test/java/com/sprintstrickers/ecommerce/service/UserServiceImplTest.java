@@ -61,7 +61,8 @@ public class UserServiceImplTest {
 	}
 	@Test(expected = InvalidUser.class)
 	public void testLoginUserNotFound() throws InvalidUser {
-		Mockito.when(userRepository.findByEmail("nnares21@gmail.com")).thenReturn(Optional.of(user));
+		Optional<User> optionalUser=Optional.ofNullable(null);
+		Mockito.when(userRepository.findByEmail("nnares21@gmail.com")).thenReturn(optionalUser);
 		userServiceImpl.userLogin(loginRequestDto);
 	}
 
