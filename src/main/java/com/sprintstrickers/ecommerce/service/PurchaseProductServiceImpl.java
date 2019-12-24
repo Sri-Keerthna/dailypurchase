@@ -1,14 +1,28 @@
 package com.sprintstrickers.ecommerce.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.sprintstrickers.ecommerce.dto.CreditCardDetailsDto;
+import com.sprintstrickers.ecommerce.dto.CreditCardDetailsResponseDto;
+import com.sprintstrickers.ecommerce.dto.CreditCardRequestDto;
 import com.sprintstrickers.ecommerce.dto.PurchaseProductRequestDto;
 import com.sprintstrickers.ecommerce.dto.PurchaseProductResponseDto;
+import com.sprintstrickers.ecommerce.dto.ResponseDto;
 import com.sprintstrickers.ecommerce.entity.Product;
 import com.sprintstrickers.ecommerce.entity.User;
 import com.sprintstrickers.ecommerce.entity.UserOrder;
@@ -25,46 +39,85 @@ import com.sprintstrickers.ecommerce.utils.ApiConstant;
  */
 @Service
 public class PurchaseProductServiceImpl implements PurchaseProductService {
+
 	@Autowired
 	ProductRepository productRepository;
+
 	@Autowired
 	UserRepository userRepository;
+
 	@Autowired
 	UserOrderRepository userOrderRepository;
+
 	public static final Logger logger = LoggerFactory.getLogger(PurchaseProductServiceImpl.class);
+
 	/**
-	 * @throws InvalidProduct 
-	 * @throws InvalidUser 
+	 * @throws InvalidProduct
+	 * @throws InvalidUser
 	 *
 	 */
 	@Override
-	public PurchaseProductResponseDto purchaseProduct(Integer userId, Integer productId,PurchaseProductRequestDto purchaseProductRequestDto) throws InvalidProduct, InvalidUser {
+	public PurchaseProductResponseDto purchaseProduct(Integer userId, Integer productId,
+			PurchaseProductRequestDto purchaseProductRequestDto) throws InvalidProduct, InvalidUser {
+
 		logger.info("Entering into the purchaseProduct method in PurchaseProductServiceImpl");
-		PurchaseProductResponseDto purchaseProductResponseDto=null;
-		Optional<User> optionalUser=userRepository.findByUserId(userId);
-		if(optionalUser.isPresent()) {
-			Optional<Product> optionalProduct=productRepository.findByProductId(productId);
-			if(optionalProduct.isPresent()) {
-				UserOrder order=new UserOrder();
-				purchaseProductResponseDto=new PurchaseProductResponseDto();
-				//order.setUser(optionalUser.get().getUserId());
+		PurchaseProductResponseDto purchaseProductResponseDto = null;
+		Optional<User> optionalUser = userRepository.findByUserId(userId);
+		if (optionalUser.isPresent()) {
+			Optional<Product> optionalProduct = productRepository.findByProductId(productId);
+			if (optionalProduct.isPresent()) {
+				UserOrder order = new UserOrder();
+				purchaseProductResponseDto = new PurchaseProductResponseDto();
 				order.setUser(optionalUser.get());
 				order.setProductName(optionalProduct.get().getProductName());
 				order.setProductPrice(optionalProduct.get().getProductPrice());
-				Double price=optionalProduct.get().getProductPrice();
-				Integer noOfProducts=purchaseProductRequestDto.getNoOfProducts();
+				Double price = optionalProduct.get().getProductPrice();
+				Integer noOfProducts = purchaseProductRequestDto.getNoOfProducts();
 				order.setTotalQuantity(purchaseProductRequestDto.getNoOfProducts());
-				Double totalPrice=noOfProducts*price;
+				Double totalPrice = noOfProducts * price;
 				order.setTotalPrice(totalPrice);
+
+				// Call Rest Template for checking whether credit card is exists or not.
+				RestTemplate restTemplate = new RestTemplate();
+				String endPointUrl = "http://localhost:8082/mycredit/creditcards/users/"
+						+ optionalUser.get().getUserId() + "/details";
+				ResponseEntity<CreditCardDetailsResponseDto> creditCardDetailsResponseDto = restTemplate
+						.getForEntity(endPointUrl, CreditCardDetailsResponseDto.class);
+				CreditCardDetailsResponseDto restTemplateResponse = creditCardDetailsResponseDto.getBody();
+
+				// Call Rest Template for checking whether credit card is exists or not.
+
+				Map<String, Integer> params = new HashMap<>();
+				params.put("userId", optionalUser.get().getUserId());
+
+				List<CreditCardDetailsDto> creditCardDetailsDto = restTemplateResponse.getCreditCardDetails();
+				CreditCardDetailsDto inputCreditCardDetailsDto = creditCardDetailsDto.get(0);
+				CreditCardRequestDto creditCardRequestDto = new CreditCardRequestDto();
+				BeanUtils.copyProperties(inputCreditCardDetailsDto, creditCardRequestDto);
+
+				final String url = "http://localhost:8082/mycredit/users/" + userId + "/accounts";
+				HttpHeaders requestHeaders = new HttpHeaders();
+				requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+
+				HttpEntity<CreditCardRequestDto> requestEntity = new HttpEntity<>(creditCardRequestDto, requestHeaders);
+				ResponseEntity<ResponseDto> response = restTemplate
+						.exchange(url, HttpMethod.PUT, requestEntity, ResponseDto.class);
+				
+				ResponseDto responseDto = response.getBody();
+				
+				System.out.println("<=========== RESPONSE IS :" + responseDto);
+
 				userOrderRepository.save(order);
 				purchaseProductResponseDto.setMessage(ApiConstant.ORDERED_SUCCESS);
 				purchaseProductResponseDto.setStatusCode(201);
-			}else {
-				logger.info("Throwing the product not found exception in purchaseProduct method in PurchaseProductServiceImpl ");
+			} else {
+				logger.info(
+						"Throwing the product not found exception in purchaseProduct method in PurchaseProductServiceImpl ");
 				throw new InvalidProduct(ApiConstant.PRODUCT_NOT_FOUND);
 			}
-		}else {
-			logger.info("Throwing the user not found exception in purchaseProduct method in PurchaseProductServiceImpl ");
+		} else {
+			logger.info(
+					"Throwing the user not found exception in purchaseProduct method in PurchaseProductServiceImpl ");
 			throw new InvalidUser(ApiConstant.USER_NOT_FOUND);
 		}
 		return purchaseProductResponseDto;

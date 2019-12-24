@@ -63,7 +63,7 @@ public class UserOrderServiceTest {
 	public void testGetOrderListPositive() throws NoOrdersFoundException {
 		logger.info("inside the get order list method");
 		Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
-		Mockito.when(userOrderRepository.findByUserId(user)).thenReturn(userList);
+		Mockito.when(userOrderRepository.findByUserUserId(1)).thenReturn(userList);
 		BeanUtils.copyProperties(order, orderResponseDto);
 		List<OrderResponseDto> result = userOrderService.getOrderList(1);
 		assertEquals(1, result.size());
@@ -74,7 +74,7 @@ public class UserOrderServiceTest {
 		logger.info("inside the get order list method");
 		List<UserOrder> usersLists = new ArrayList<>();
 		Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
-		Mockito.when(userOrderRepository.findByUserId(user)).thenReturn(usersLists);
+		Mockito.when(userOrderRepository.findByUserUserId(22)).thenReturn(usersLists);
 		userOrderService.getOrderList(1);
 	}
 

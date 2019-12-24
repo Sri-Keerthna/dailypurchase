@@ -46,9 +46,10 @@ public class PurchaseProductController {
 	@PostMapping("/{userId}/products/{productId}")
 	public PurchaseProductResponseDto purchaseProduct(@PathVariable Integer userId, @PathVariable Integer productId,@RequestBody PurchaseProductRequestDto purchaseProductRequestDto) throws InvalidProduct, InvalidUser {
 		PurchaseProductResponseDto
-		
-		purchaseProductResponseDto=purchaseProductService.purchaseProduct(userId,productId,purchaseProductRequestDto);
+				
+		purchaseProductResponseDto = purchaseProductService.purchaseProduct(userId,productId,purchaseProductRequestDto);
 		return purchaseProductResponseDto;
+		
 	}
 	/** 
 	 * @param userId
