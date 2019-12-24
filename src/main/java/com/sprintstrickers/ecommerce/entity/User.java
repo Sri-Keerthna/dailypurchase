@@ -10,6 +10,10 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author Sri Keerthna
+ * @since 2019-12-23
+ */
 @Entity
 @Getter
 @Setter
