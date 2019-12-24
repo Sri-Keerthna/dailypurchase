@@ -56,7 +56,7 @@ public class PurchaseProductServiceImplTest {
 		product.setProductBrand("vivo");
 		product.setProductPrice(5000.55);
 		userOrder=new UserOrder();
-		userOrder.setUser(user);
+		userOrder.setUserId(user);
 		userOrder.setUserOrderId(300);
 	}
 	@Test
